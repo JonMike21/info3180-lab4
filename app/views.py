@@ -6,6 +6,8 @@ from werkzeug.utils import secure_filename
 from app.models import UserProfile
 from app.forms import LoginForm
 from werkzeug.security import check_password_hash
+from app.forms import UploadForm
+
 
 ###
 # Routing for your application.
@@ -23,18 +25,30 @@ def about():
     return render_template('about.html', name="Jon-Michael Ferguson")
 
 
+
 @app.route('/upload', methods=['POST', 'GET'])
+@login_required
 def upload():
     # Instantiate your form class
-
+    form=UploadForm()
+    
     # Validate file upload on submit
-    if form.validate_on_submit():
-        # Get file data and save to your uploads folder
+    if request.method == 'POST':
+        
+        if form.validate_on_submit():
+            #flash('File Saved', 'success')
+            # Get file data and save to your uploads folder
+            photo=form.photo.data
+            #photo=form.photo.data
+            photon=secure_filename(photo.filename)
+            photo.save(os.path.join(app.config['UPLOAD_FOLDER'],photon))
 
-        flash('File Saved', 'success')
-        return redirect(url_for('home')) # Update this to redirect the user to a route that displays all uploaded image files
 
-    return render_template('upload.html')
+            flash('File Saved', 'success')
+            return redirect(url_for('home')) # Update this to redirect the user to a route that displays all uploaded image files
+            
+            
+    return render_template('upload.html',form=form)
 
 
 @app.route('/login', methods=['POST', 'GET'])
@@ -64,7 +78,7 @@ def login():
 
             # Remember to flash a message to the user
             flash('Logged in successfully.', 'success')
-            return redirect(url_for("/upload"))  # The user should be redirected to the upload form instead
+            return redirect(url_for("upload"))  # The user should be redirected to the upload form instead
         else:
             flash('Username or Password is incorrect.', 'danger')
     
