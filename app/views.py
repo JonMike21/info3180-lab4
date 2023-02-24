@@ -45,7 +45,7 @@ def upload():
 
 
             flash('File Saved', 'success')
-            return redirect(url_for('home')) # Update this to redirect the user to a route that displays all uploaded image files
+            return redirect(url_for('files')) # Update this to redirect the user to a route that displays all uploaded image files
             
             
     return render_template('upload.html',form=form)
@@ -115,7 +115,15 @@ def get_image(filename):
 @app.route('/files')
 @login_required
 def files():
-    return render_template('files.html',images=get_upload_images())
+    return render_template('files.html',photos=get_upload_images())
+
+@app.route('/logout')
+@login_required
+def logout():
+    logout_user()
+    flash('You have Logged-Out Sucessfully', 'success')
+    return redirect(url_for('home'))
+
 
 ###
 # The functions below should be applicable to all Flask apps.
